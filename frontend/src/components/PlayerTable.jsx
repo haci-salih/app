@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { CheckCircle2, AlertTriangle, XCircle, ExternalLink, ArrowUpDown } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, ExternalLink, ArrowUpDown, UserX } from "lucide-react";
 
 function StatusBadge({ status }) {
     if (status === "full") {
@@ -38,6 +38,10 @@ export default function PlayerTable({ participants = [] }) {
     const sorted = useMemo(() => {
         const arr = [...participants];
         arr.sort((a, b) => {
+            // Players who left the clan (or are clanless) go to the bottom.
+            const aLeft = !!a.left_clan;
+            const bLeft = !!b.left_clan;
+            if (aLeft !== bLeft) return aLeft ? 1 : -1;
             const av = a[sortBy.key];
             const bv = b[sortBy.key];
             if (typeof av === "number" && typeof bv === "number") {
@@ -105,11 +109,16 @@ export default function PlayerTable({ participants = [] }) {
                     )}
                     {sorted.map((p, idx) => {
                         const profileUrl = `https://royaleapi.com/player/${(p.tag || "").replace("#", "")}`;
+                        const left = !!p.left_clan;
+                        const leftLabel = p.current_clan_tag
+                            ? `Başka klanda · ${p.current_clan_tag}`
+                            : "Klansız";
                         return (
                             <tr
                                 key={p.tag || idx}
                                 data-testid={`player-row-${p.tag}`}
-                                className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                                data-left-clan={left ? "true" : "false"}
+                                className={`border-b border-white/5 transition-colors ${left ? "opacity-40 hover:opacity-70" : "hover:bg-white/[0.02]"}`}
                             >
                                 <td className="px-4 py-3 text-zinc-500 font-mono text-xs">
                                     {idx + 1}
@@ -125,8 +134,18 @@ export default function PlayerTable({ participants = [] }) {
                                         {p.name}
                                         <ExternalLink className="w-3 h-3 opacity-60" />
                                     </a>
-                                    <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                        {p.tag}
+                                    <div className="text-[10px] font-mono text-zinc-500 mt-0.5 flex items-center gap-2 flex-wrap">
+                                        <span>{p.tag}</span>
+                                        {left && (
+                                            <span
+                                                data-testid={`player-left-badge-${p.tag}`}
+                                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-600/60 text-zinc-400 normal-case tracking-normal"
+                                                title={leftLabel}
+                                            >
+                                                <UserX className="w-2.5 h-2.5" />
+                                                {p.current_clan_tag ? "Ayrıldı" : "Klansız"}
+                                            </span>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 text-right font-mono text-zinc-100 tabular-nums">

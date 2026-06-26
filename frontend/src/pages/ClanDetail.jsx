@@ -128,13 +128,14 @@ export default function ClanDetail() {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6" data-testid="clan-stats">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6" data-testid="clan-stats">
                             <Stat label="Toplam Madalyon" value={snap.total_fame?.toLocaleString("tr-TR") || 0} accent="text-yellow-400" />
                             <Stat label="Kullanılan Deste" value={snap.total_decks_used || 0} />
                             <Stat label="Oyuncular" value={participants.length} />
                             <Stat label="Tamamlayan" value={snap.full_count || 0} accent="text-emerald-400" />
                             <Stat label="Yarım" value={snap.partial_count || 0} accent="text-amber-400" />
                             <Stat label="Yapmayan" value={snap.none_count || 0} accent="text-rose-400" />
+                            <Stat label="Ayrılan" value={snap.left_count || 0} accent="text-zinc-400" />
                         </div>
 
                         <div className="flex items-center justify-between mb-3">

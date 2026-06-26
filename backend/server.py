@@ -128,6 +128,40 @@ async def royale_get(path: str) -> Dict[str, Any]:
     return resp.json()
 
 
+async def fetch_player_current_clan(player_tag: str) -> Dict[str, Any]:
+    """Return {'ok': bool, 'clan_tag': Optional[str]}. ok=False means lookup failed."""
+    try:
+        data = await royale_get(f"/players/{tag_for_url(player_tag)}")
+    except Exception as e:
+        logger.warning(f"Player lookup failed for {player_tag}: {e}")
+        return {"ok": False, "clan_tag": None}
+    clan = data.get("clan") or {}
+    return {"ok": True, "clan_tag": clan.get("tag")}
+
+
+async def enrich_participants_with_clan_status(participants: List[Dict[str, Any]], war_clan_tag: str) -> None:
+    """Mutates participants in-place to add current_clan_tag and left_clan flag."""
+    sem = asyncio.Semaphore(6)
+
+    async def one(p):
+        if not p.get("tag"):
+            p["current_clan_tag"] = None
+            p["left_clan"] = False
+            p["clan_check_ok"] = False
+            return
+        async with sem:
+            res = await fetch_player_current_clan(p["tag"])
+        p["clan_check_ok"] = res["ok"]
+        p["current_clan_tag"] = res["clan_tag"]
+        # Only mark left when we actually got a definitive answer.
+        if res["ok"]:
+            p["left_clan"] = (res["clan_tag"] != war_clan_tag)
+        else:
+            p["left_clan"] = False
+
+    await asyncio.gather(*(one(p) for p in participants))
+
+
 def classify_player(decks_used_today: int) -> str:
     if decks_used_today >= 4:
         return "full"
@@ -176,11 +210,16 @@ async def sync_clan_data(clan_doc: Dict[str, Any]) -> Dict[str, Any]:
     period_type = data.get("periodType")
     section_index = data.get("sectionIndex")
 
+    # Enrich participants with their current clan tag (so we can mark "ayrılan" players).
+    if participants:
+        await enrich_participants_with_clan_status(participants, tag)
+
     total_fame = sum(p["fame"] for p in participants)
     total_decks = sum(p["decks_used"] for p in participants)
     full_count = sum(1 for p in participants if p["status"] == "full")
     partial_count = sum(1 for p in participants if p["status"] == "partial")
     none_count = sum(1 for p in participants if p["status"] == "none")
+    left_count = sum(1 for p in participants if p.get("left_clan"))
 
     snapshot_date = today_str()
     snapshot = {
@@ -198,6 +237,7 @@ async def sync_clan_data(clan_doc: Dict[str, Any]) -> Dict[str, Any]:
         "full_count": full_count,
         "partial_count": partial_count,
         "none_count": none_count,
+        "left_count": left_count,
         "saved_at": now_iso(),
     }
 
