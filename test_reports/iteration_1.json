@@ -1,0 +1,40 @@
+{
+  "summary": "Backend (13 pytest cases) and Frontend (Playwright) e2e testing completed for Clan War Tracker. All critical flows pass: auth (login/wrong creds/me/protected endpoints), folder CRUD with default-protection, clan CRUD with Royale API integration, manual & global sync, history with date filter, and full UI navigation (login → overview → clan detail → history → logout). Player links correctly open RoyaleAPI in new tab. Test clan #2PP works end-to-end, #LR0CV8YV returns 404 on currentriverrace so its sync is marked failed (Royale-API-side, not a bug, but backend could downgrade to a softer state).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/clans/{id}/sync", "issue": "Propagates Royale API 404 as HTTP 404 to client when clan has no current river race. Consider catching and returning a notInWar snapshot instead of failing. Currently auto-sync also counts it as a hard failure (e.g. XD clan continually shows '1 hata')."},
+      {"endpoint": "POST /api/clans", "issue": "normalize_tag replaces every 'O' with '0' which is too aggressive — many valid tags contain letter O. Could falsely reject/mismatch tags."},
+      {"endpoint": "POST /api/clans (initial sync)", "issue": "If initial sync fails, clan is still created without a snapshot; user sees 'henüz senkronize edilmedi'. Acceptable but error reason isn't surfaced in the response."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Overview header", "issues": ["'2 ok / 1 hata' shown but not clickable to view error details for the failing clan"]},
+      {"screen": "Sidebar folder/clan delete buttons", "issues": ["Trash icons are opacity-0 by default and only show on hover; not very discoverable on touch devices. Acceptable on desktop."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "(Optional, minor) Handle Royale API 404 inside sync_clan_data by saving a notInWar/empty snapshot instead of raising HTTPException so 'failed' count and UI badge stay clean for clans without an active river race.",
+    "(Optional) Reconsider normalize_tag replacing 'O' with '0' — Royale tags don't actually contain the letter O (Supercell omits it), so the rule is safe but could be made explicit/documented.",
+    "(Optional) Surface last_sync_error on clan cards (tooltip) so users understand why a clan shows '—' state."
+  ],
+  "critical_code_review_comments": [
+    "server.py mixes normalize_tag(replace 'O' -> '0') which is correct for Supercell tags but should be documented as intentional.",
+    "Lifespan ensures default folder ('Genel') is created once, scheduler starts with configurable interval — clean.",
+    "CORS allow_credentials=True with allow_origins='*' — fine here since auth is Bearer in header, not cookies, but worth noting.",
+    "war_snapshots upsert keyed by (clan_id, snapshot_date) — overwrites within the day, which matches the daily history requirement.",
+    "delete_clan removes snapshots — good. Foreign key cleanup is consistent."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% (login, overview, sidebar, add-folder, add-clan dialog open, clan-detail, history, player link, logout)"},
+  "test_credentials": "TK / 2903 (from backend/.env AUTH_USERNAME/AUTH_PASSWORD). No /app/memory/test_credentials.md file exists.",
+  "seed_data_creation": "Test created and cleaned up: folder 'TEST_UI_Folder' and clan '#2PP' (re-added then deleted by lifecycle test, then re-added manually for UI test). Orphan clan #LR0CV8YV from a prior failed test iteration was also cleaned up. Final DB state: 2 clans (#2PP RoYaLe PiNoY, #GYUYCY9C Alper CR) + default 'Genel' folder.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All endpoints in /api are working with Bearer auth (jwt). Reliable test clan: #2PP. Avoid using #LR0CV8YV — currentriverrace returns 404 for it. Pytest file: /app/backend/tests/backend_test.py. data-testid coverage on UI is excellent.",
+  "rca of the issue": "Initial pytest used #LR0CV8YV which returned 404 from Royale /currentriverrace. Manual sync surfaced the upstream 404 as a backend 404. Switching to #2PP resolved; underlying minor backend issue documented above."
+}
