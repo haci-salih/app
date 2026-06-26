@@ -1,0 +1,105 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 2: The Performance Pro (Tactical Esports Dashboard)",
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "IBM Plex Sans",
+    "mono_font": "JetBrains Mono",
+    "h1": "text-4xl sm:text-5xl tracking-tighter font-black uppercase text-white",
+    "h2": "text-2xl sm:text-3xl tracking-tight font-bold text-white",
+    "h3": "text-xl sm:text-2xl tracking-tight font-bold text-gray-100",
+    "h4": "text-lg sm:text-xl font-semibold text-gray-200",
+    "body": "text-base leading-relaxed text-zinc-300 font-medium",
+    "small": "text-sm tracking-wide text-zinc-400 font-mono",
+    "labels": "text-xs tracking-[0.2em] uppercase text-zinc-500 font-mono"
+  },
+  "colors": {
+    "background": "bg-[#0A0A0A]",
+    "surface": "bg-[#141414]",
+    "surface_hover": "hover:bg-[#1A1A1A]",
+    "border": "border-white/10",
+    "border_active": "border-white/30",
+    "primary": "bg-blue-600 text-white hover:bg-blue-500 transition-colors",
+    "semantic": {
+      "success": "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20",
+      "warning": "text-amber-400 bg-amber-400/10 border border-amber-400/20",
+      "danger": "text-rose-500 bg-rose-500/10 border border-rose-500/20",
+      "accent_gold": "text-yellow-500"
+    },
+    "text": {
+      "primary": "text-white",
+      "secondary": "text-zinc-400",
+      "muted": "text-zinc-500"
+    }
+  },
+  "layout_and_spacing": {
+    "strategy": "Control Room Grid",
+    "container": "w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8",
+    "sidebar": "w-[280px] shrink-0 border-r border-white/10 h-screen sticky top-0 bg-[#0A0A0A] flex flex-col",
+    "main_content": "flex-1 min-h-screen bg-[#0A0A0A] p-6 lg:p-8",
+    "card": "bg-[#141414] border border-white/10 p-6 rounded-md",
+    "card_dense": "bg-[#141414] border border-white/10 p-4 rounded-md",
+    "gap_standard": "gap-6",
+    "gap_tight": "gap-4"
+  },
+  "motion_and_interaction": {
+    "hover": "transition-all duration-200 ease-in-out",
+    "active": "active:scale-[0.98]",
+    "focus": "focus:outline-none focus:ring-2 focus:ring-blue-500/50",
+    "row_hover": "hover:bg-white/[0.02]"
+  },
+  "components": {
+    "login_screen": {
+      "wrapper": "min-h-screen flex items-center justify-center bg-[#0A0A0A] bg-cover bg-center relative before:absolute before:inset-0 before:bg-black/80 before:z-0",
+      "card": "w-full max-w-md bg-[#141414]/90 backdrop-blur-xl border border-white/10 p-8 rounded-lg z-10 shadow-2xl relative"
+    },
+    "sidebar": {
+      "folder_header": "flex items-center justify-between py-2 px-3 text-sm font-mono text-zinc-400 hover:text-white cursor-pointer group uppercase tracking-wider",
+      "clan_item": "flex items-center py-2.5 px-3 pl-8 text-sm font-medium text-zinc-300 hover:bg-white/5 hover:text-white rounded-md cursor-pointer transition-colors"
+    },
+    "data_table": {
+      "wrapper": "w-full overflow-x-auto rounded-md border border-white/10 bg-[#141414]",
+      "header_cell": "px-4 py-3 text-left text-xs font-mono tracking-[0.1em] uppercase text-zinc-500 bg-[#0F0F0F] border-b border-white/10",
+      "row": "border-b border-white/5 hover:bg-white/[0.02] transition-colors",
+      "cell": "px-4 py-3 text-sm font-medium text-zinc-300 whitespace-nowrap",
+      "player_link": "text-blue-400 hover:text-blue-300 hover:underline cursor-pointer transition-colors"
+    },
+    "badges": {
+      "base": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-bold uppercase",
+      "full_sync": "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+      "partial_sync": "text-amber-400 bg-amber-400/10 border-amber-400/20",
+      "no_sync": "text-rose-500 bg-rose-500/10 border-rose-500/20"
+    },
+    "bento_stats": {
+      "grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6",
+      "item": "bg-[#141414] border border-white/10 p-5 rounded-md flex flex-col justify-center",
+      "label": "text-xs font-mono text-zinc-500 mb-2 uppercase tracking-widest",
+      "value": "text-3xl font-black text-white font-mono"
+    }
+  },
+  "testing_rules": {
+    "data_testid": "All interactive elements (buttons, links, inputs, dropdowns) and key informational elements MUST include a data-testid attribute formatted in kebab-case (e.g., data-testid='login-submit-button')."
+  },
+  "icons_and_assets": {
+    "library": "lucide-react",
+    "images": [
+      {
+        "url": "https://images.pexels.com/photos/6485524/pexels-photo-6485524.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Dark textured surface with shimmering highlights",
+        "category": "login_background"
+      }
+    ]
+  },
+  "specific_instructions_for_main_agent": [
+    "Ensure the UI text is exclusively in Turkish (Türkçe) as requested.",
+    "The UI is a data-dense esports/gaming dashboard. Do NOT use soft shadows or heavy rounded corners. Keep it tactical (rounded-md max) and use 1px solid borders (border-white/10).",
+    "For the Player Profile link, make sure it opens in a new tab (target='_blank' rel='noopener noreferrer') pointing to the RoyaleAPI URL.",
+    "Data table MUST clearly highlight war participation using semantic colors and icons: Green for Tamamını Yapanlar (✅), Yellow for Yarısını Yapanlar (🟡), and Red for Yapmayanlar (❌).",
+    "Top bar/header must contain the Manual Sync ('Manuel Senkronizasyon') button and an Auto-Sync status indicator showing the last pulled time (e.g., 'Son senkronizasyon: 3 dk önce').",
+    "History page ('Geçmiş') should include a DatePicker component from Shadcn to filter the logs visually. Filter by 'Klan Savaşı Gününün ya da hazırlık gününün bitişi'.",
+    "Folder management in the sidebar must allow grouping clans visually and should include an 'Klan Ekle' (Add Clan) button and functionality to delete a clan.",
+    "Do NOT use Space Grotesk font. Ensure you use Outfit for Headings, IBM Plex Sans for body, and JetBrains Mono for data points/tables. Import them from Google Fonts in index.html or globals.css.",
+    "Use Shadcn components for complex interactions like Modals (Dialog) for adding clans, Dropdowns, and DatePickers.",
+    "Apply `data-testid` attributes to every interactable component and critical piece of information."
+  ]
+}
