@@ -159,9 +159,15 @@ async def sync_clan_data(clan_doc: Dict[str, Any]) -> Dict[str, Any]:
     try:
         data = await royale_get(f"/clans/{tag_for_url(tag)}/currentriverrace")
     except HTTPException as e:
-        logger.error(f"Sync failed for {tag}: {e.detail}")
-        await db.clans.update_one({"id": clan_doc["id"]}, {"$set": {"last_sync_error": str(e.detail), "last_sync_attempt": now_iso()}})
-        raise
+        # 404 from currentriverrace usually means clan is not in a river race right now.
+        # Treat as notInWar (soft state) instead of a hard failure so auto-sync stays clean.
+        if e.status_code == 404:
+            logger.info(f"Clan {tag} not in current river race (404 -> notInWar)")
+            data = {"state": "notInWar", "clan": {}, "periodIndex": None, "periodType": None, "sectionIndex": None}
+        else:
+            logger.error(f"Sync failed for {tag}: {e.detail}")
+            await db.clans.update_one({"id": clan_doc["id"]}, {"$set": {"last_sync_error": str(e.detail), "last_sync_attempt": now_iso()}})
+            raise
 
     clan_section = data.get("clan", {}) or {}
     participants = build_participants(clan_section)
